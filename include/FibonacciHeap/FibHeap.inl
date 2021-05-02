@@ -163,7 +163,6 @@ void FibHeap<K, D>::_consolidate() {
         temp = temp->next;
     } while (Head != temp);
 
-    n    = 0;
     Head = nullptr;
 
     for (auto Node : DegreeTable) {
