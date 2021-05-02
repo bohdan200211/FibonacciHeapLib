@@ -163,6 +163,7 @@ void FibHeap<K, D>::_consolidate() {
         temp = temp->next;
     } while (Head != temp);
 
+    n    = 0;
     Head = nullptr;
 
     for (auto Node : DegreeTable) {
@@ -187,8 +188,10 @@ void FibHeap<K, D>::PrintHeap() const {
 
 template<typename K, typename D>
 FibHeap<K, D>::~FibHeap() {
-    Head->prev->next = nullptr;
-    delete Head;
+    if (Head) {
+        Head->prev->next = nullptr;
+        delete Head;
+    }
 }
 
 
@@ -220,7 +223,12 @@ void FibHeap<K, D>::_cut(FibNode<K, D> * x, FibNode<K, D> * y) {
         y->child = x->next;
     }
     _delete_node(x);
-    Insert(x);
+
+    _insert_front_x(x, Head);
+    if (Head->Key >= x->Key) {
+        Head = x;
+    }
+
     x->mark = false;
     y->degree--;
 }
