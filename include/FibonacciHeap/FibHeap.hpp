@@ -30,7 +30,6 @@ private:
     void _cascading_cut(FibNode<K, D>*);
 
 private:
-    size_t n;
     FibNode<K, D> * Head;
 };
 

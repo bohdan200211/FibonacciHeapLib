@@ -4,15 +4,13 @@
 
 template<typename K, typename D>
 FibHeap<K, D>::FibHeap():
-        Head(nullptr), n(0) {}
+        Head(nullptr) {}
 
 
 template<typename K, typename D>
 void FibHeap<K, D>::Insert(FibNode<K, D> * newNode) {
-    size_t new_n = pow(2, newNode->degree);
     if (Head == nullptr) {
         Head = newNode;
-        n = pow(2, newNode->degree);
         return;
     }
 
@@ -21,8 +19,6 @@ void FibHeap<K, D>::Insert(FibNode<K, D> * newNode) {
     if (Head->Key >= newNode->Key) {
         Head = newNode;
     }
-
-    n += new_n;
 }
 
 
@@ -46,7 +42,6 @@ void FibHeap<K, D>::Union(FibHeap<K, D> *F1, FibHeap<K, D> *F2) {
         H2->prev = H1;
 
         Head = (H1->Key > H2->Key)? H2 : H1;
-        n    = F1->n + F2->n;
     } else if (H1) {
         Head = H1;
     } else {
@@ -84,7 +79,6 @@ FibNode<K, D> *FibHeap<K, D>::ExtractMinimumNode() {
         auto * temp = Head->next;
         _delete_node(minimum);
 
-        n = n - 1;
         if (Head == temp) {
             Head = nullptr;
         } else {
@@ -136,9 +130,18 @@ void FibHeap<K, D>::_insert_front_x(FibNode<K, D> * y, FibNode<K, D> * x) {
 
 template<typename K, typename D>
 void FibHeap<K, D>::_consolidate() {
-    std::vector<FibNode<K, D>*> DegreeTable(log2(n + 1) + 2, nullptr);
+    FibNode<K, D> * temp = Head;
+    FibNode<K, D> * curr = temp;
 
-    FibNode<K, D> * temp  = Head;
+    size_t n         = 0;
+    size_t maxDegree = 0;
+    do {
+        maxDegree = std::max(curr->degree, maxDegree);
+        curr = curr->next;
+        ++n;
+    } while (temp != curr);
+
+    std::vector<FibNode<K, D>*> DegreeTable(log2(n) + maxDegree + 1, nullptr);
 
     do {
         FibNode<K, D>*  x = temp;
@@ -148,17 +151,16 @@ void FibHeap<K, D>::_consolidate() {
             FibNode<K, D> * y = DegreeTable[d];
             if (x->Key > y->Key) {
                 std::swap(x, y);
-                temp = x;
             }
+            temp = x;
             _fib_link(y, x);
-            if (Head == y) {
-                Head = x;
-            }
             DegreeTable[d] = nullptr;
             d = d + 1;
+
+            Head = x;
         }
         DegreeTable[d] = x;
-//        x->parent = nullptr;
+        x->parent = nullptr;
 
         temp = temp->next;
     } while (Head != temp);
@@ -169,9 +171,6 @@ void FibHeap<K, D>::_consolidate() {
         if (Node) {
             Node->prev = Node->next = Node;
             Insert(Node);
-            if (Head == nullptr || Node->Key < Head->Key) {
-                Head = Node;
-            }
         }
     }
 }

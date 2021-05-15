@@ -20,8 +20,8 @@ public:
     ~FibNode();
 
     void PrintNode (FibNode<K, D> * start, const std::string & prefix = "", bool isLast = false) const;
-    inline K GetKey() { return Key; }
-    inline D GetData() { return Data; }
+    inline K GetKey() const { return Key; }
+    inline D GetData() const { return Data; }
 
 private:
     FibNode * parent;
